@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audita AI — Plataforma integral de auditorías ISO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- CSS modular -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/tables.css">
+<link rel="stylesheet" href="css/stats.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/audits.css">
+<link rel="stylesheet" href="css/checklist.css">
+<link rel="stylesheet" href="css/companies.css">
+<link rel="stylesheet" href="css/standards.css">
+<link rel="stylesheet" href="css/reports.css">
+<link rel="stylesheet" href="css/traceability.css">
+</head>
+<body>
+
+<!-- ============= LOGIN ============= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">A</div>
+      <div class="login-logo-text">Audita<span>.AI</span></div>
+    </div>
+    <h1 class="login-title">Bienvenido</h1>
+    <p class="login-sub">Plataforma integral de gestión de auditorías ISO. Selecciona tu rol para ingresar a la demo.</p>
+
+    <div class="role-grid" id="roleGrid">
+      <div class="role-chip active" data-role="admin" data-email="admin@auditaai.com" data-pass="admin2026">⚙️ Administrador</div>
+      <div class="role-chip" data-role="auditor" data-email="auditor@auditaai.com" data-pass="auditor2026">🔍 Auditor</div>
+      <div class="role-chip" data-role="auditado" data-email="auditado@auditaai.com" data-pass="auditado2026">📋 Auditado</div>
+    </div>
+
+    <div class="field">
+      <label>Correo / Usuario</label>
+      <input type="text" id="loginUser" value="admin@auditaai.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" value="admin2026" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-block" onclick="doLogin()">Ingresar a la plataforma →</button>
+    <div class="login-demo-hint">
+      <strong>Demo:</strong>
+      admin@auditaai.com / admin2026 &nbsp;·&nbsp;
+      auditor@auditaai.com / auditor2026 &nbsp;·&nbsp;
+      auditado@auditaai.com / auditado2026
+    </div>
+  </div>
+</div>
+
+<!-- ============= APP ============= -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-mark">A</div>
+      <div class="sidebar-brand-text">Audita<span>.AI</span></div>
+    </div>
+
+    <div class="sidebar-section">Principal</div>
+    <div class="nav-item active" data-page="dashboard" data-roles="admin,auditor,auditado">
+      <span class="nav-icon">🏠</span><span>Inicio</span>
+    </div>
+    <div class="nav-item" data-page="audits" data-roles="admin,auditor,auditado">
+      <span class="nav-icon">📋</span><span>Auditorías</span>
+      <span class="nav-badge" id="navAuditCount">0</span>
+    </div>
+    <div class="nav-item" data-page="findings" data-roles="admin,auditor,auditado">
+      <span class="nav-icon">🚩</span><span>Hallazgos</span>
+      <span class="nav-badge alert" id="navFindingsCount">0</span>
+    </div>
+    <div class="nav-item" data-page="actions" data-roles="admin,auditor,auditado">
+      <span class="nav-icon">🎯</span><span>Planes de acción</span>
+    </div>
+
+    <div class="sidebar-section nav-section-config" data-roles="admin,auditor">Configuración</div>
+    <div class="nav-item" data-page="companies" data-roles="admin,auditor">
+      <span class="nav-icon">🏢</span><span>Empresas</span>
+    </div>
+    <div class="nav-item" data-page="standards" data-roles="admin,auditor">
+      <span class="nav-icon">📚</span><span>Estándares</span>
+    </div>
+    <div class="nav-item" data-page="users" data-roles="admin">
+      <span class="nav-icon">👥</span><span>Usuarios</span>
+    </div>
+
+    <div class="sidebar-section nav-section-analysis" data-roles="admin,auditor,auditado">Análisis</div>
+    <div class="nav-item" data-page="reports" data-roles="admin,auditor,auditado">
+      <span class="nav-icon">📄</span><span>Reportes</span>
+    </div>
+    <div class="nav-item" data-page="traceability" data-roles="admin">
+      <span class="nav-icon">🔐</span><span>Trazabilidad</span>
+    </div>
+  </aside>
+
+  <header class="topbar">
+    <div class="topbar-search">
+      <input type="text" id="globalSearch" placeholder="Buscar auditorías, hallazgos, normas... (Ctrl+K)">
+    </div>
+    <div class="topbar-actions">
+      <button class="topbar-btn" id="notifBtn" title="Notificaciones" onclick="showNotifications()">🔔<span class="dot"></span></button>
+      <div class="user-chip" onclick="showUserMenu()">
+        <div class="user-avatar" id="userAvatar">--</div>
+        <div>
+          <div class="user-name" id="userName">Usuario</div>
+          <div class="user-role" id="userRole">Rol</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="pageContainer"></div>
+  </main>
+</div>
+
+<!-- Modal root y toasts -->
+<div id="modalRoot"></div>
+<div id="toasts"></div>
+
+<!-- Data layer -->
+<script src="data.js"></script>
+
+<!-- Core app -->
+<script src="app.js"></script>
+
+<!-- Pages -->
+<script src="pages/dashboard.js"></script>
+<script src="pages/audits.js"></script>
+<script src="pages/findings.js"></script>
+<script src="pages/actions.js"></script>
+<script src="pages/companies.js"></script>
+<script src="pages/standards.js"></script>
+<script src="pages/users.js"></script>
+<script src="pages/reports.js"></script>
+<script src="pages/traceability.js"></script>
+
+</body>
+</html>
