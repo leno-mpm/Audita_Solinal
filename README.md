@@ -12,7 +12,7 @@ Abre `index.html` directamente en el navegador (no requiere servidor).
 |-----|--------|------------|
 | Administrador | admin@auditaai.com | admin2026 |
 | Auditor | auditor@auditaai.com | auditor2026 |
-| Auditado | auditado@auditaai.com | auditado2026 |
+| Auditado | srivera@indura.ec | auditado2026 |
 
 ---
 
