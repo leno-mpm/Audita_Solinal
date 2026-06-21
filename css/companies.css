@@ -1,0 +1,30 @@
+/* ============================================================
+   AUDITA AI · companies.css — Tarjetas y grid de empresas
+   ============================================================ */
+
+.companies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.company-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 20px; cursor: pointer;
+  transition: var(--transition); box-shadow: var(--shadow-sm);
+}
+.company-card:hover {
+  border-color: var(--teal); box-shadow: 0 6px 24px rgba(16,217,160,.12); transform: translateY(-2px);
+}
+.company-card-head { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+.company-logo {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal), #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.company-info { flex: 1; min-width: 0; }
+.company-name { font-weight: 800; font-size: 14.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.company-meta { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+.company-stats { display: flex; gap: 16px; padding: 13px 0; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); margin-bottom: 14px; }
+.company-stat { text-align: center; flex: 1; }
+.company-stat-val { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+.company-stat-label { font-size: 10px; color: var(--text-dim); margin-top: 3px; font-weight: 600; }
+.company-actions { display: flex; gap: 6px; }
+
+@media (max-width: 768px) { .companies-grid { grid-template-columns: 1fr; } }
