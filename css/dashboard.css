@@ -2,4 +2,37 @@
    AUDITA AI · dashboard.css — Continue cards, Kanban
    ============================================================ */
 
+.continue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.continue-card {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm);
+}
+.continue-card-title { font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.continue-card-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+
+/* Kanban */
+.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 900px) { .kanban { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .kanban { grid-template-columns: 1fr; } }
+.kanban-col {
+  background: var(--surface2); border-radius: var(--radius);
+  padding: 14px; border: 1.5px solid var(--border);
+}
+.kanban-col-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; font-size: 12px; font-weight: 700; color: var(--text-dim);
+}
+.kanban-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px; margin-bottom: 8px;
+  cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);
+}
+.kanban-card:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,217,160,.1); }
+.kanban-card:last-child { margin-bottom: 0; }
+.kanban-card-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 7px; }
+.kanban-card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.kanban-card-due { font-size: 11px; color: var(--text-dim); }
+
+@media (max-width: 768px) { .kanban { grid-template-columns: 1fr; } }
+
 
