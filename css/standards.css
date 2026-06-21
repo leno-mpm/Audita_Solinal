@@ -1,0 +1,24 @@
+/* ============================================================
+   AUDITA AI · standards.css — Tarjetas de estándares ISO
+   ============================================================ */
+
+.standards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.standard-card { transition: var(--transition); cursor: default; }
+.standard-card:hover { border-color: var(--teal); box-shadow: 0 6px 24px rgba(16,217,160,.1); transform: translateY(-1px); }
+.standard-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.standard-badge {
+  padding: 7px 13px; border-radius: 8px; background: var(--navy); color: var(--teal);
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.standard-info { flex: 1; }
+.standard-name { font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+.standard-meta { font-size: 11px; color: var(--text-dim); }
+.standard-desc { color: var(--text-dim); font-size: 12.5px; line-height: 1.55; margin-bottom: 16px; }
+.standard-stats { display: flex; gap: 16px; padding: 13px 0; border-top: 1.5px solid var(--border); border-bottom: 1.5px solid var(--border); margin-bottom: 14px; }
+.std-stat { text-align: center; flex: 1; font-size: 12px; }
+.std-stat strong { display: block; font-size: 22px; font-family: 'Fraunces', serif; font-weight: 800; color: var(--text); line-height: 1.2; }
+.std-stat span { color: var(--text-dim); font-size: 11px; font-weight: 600; }
+.standard-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+@media (max-width: 768px) { .standards-grid { grid-template-columns: 1fr; } }
