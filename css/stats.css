@@ -1,0 +1,72 @@
+/* ============================================================
+   AUDITA AI · stats.css — Stat cards, KPI row, Charts grid
+   ============================================================ */
+
+.stats-grid,
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 20px;
+}
+.stats-grid[data-cols="2"] { grid-template-columns: repeat(2, 1fr); }
+.stats-grid[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+.stats-grid[data-cols="5"] { grid-template-columns: repeat(5, 1fr); }
+.stats-grid[data-cols="6"] { grid-template-columns: repeat(3, 1fr); }
+
+.stat-card,
+.kpi-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 22px 22px 18px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s;
+}
+.stat-card:hover, .kpi-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+
+/* Colored top accent */
+.stat-card::before, .kpi-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--teal);
+}
+.stat-card:nth-child(2)::before, .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+.stat-card:nth-child(3)::before, .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+.stat-card:nth-child(4)::before, .kpi-card:nth-child(4)::before { background: linear-gradient(90deg, #f43f5e, #fb7185); }
+.stat-card:nth-child(5)::before, .kpi-card:nth-child(5)::before { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+.stat-card:nth-child(6)::before, .kpi-card:nth-child(6)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+.stat-card.warn { border-color: rgba(249,115,22,.25); }
+.stat-card.warn::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+.stat-card.ok  { border-color: rgba(16,217,160,.25); }
+.stat-card.ok::before  { background: linear-gradient(90deg, #10d9a0, #34d399); }
+
+/* Subtle glow */
+.stat-card::after, .kpi-card::after {
+  content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(99,102,241,.08), transparent 70%); pointer-events: none;
+}
+
+.stat-label, .kpi-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;
+}
+.stat-value, .kpi-value {
+  font-family: 'Fraunces', serif; font-size: 38px; font-weight: 800;
+  color: var(--text); line-height: 1; margin-bottom: 7px;
+}
+.stat-delta, .stat-change { font-size: 12px; color: var(--text-dim); }
+.stat-delta.up, .stat-change.up { color: var(--teal-dark); font-weight: 600; }
+.stat-delta.down, .stat-change.down { color: var(--danger); font-weight: 600; }
+.text-danger .stat-value, .kpi-card .text-danger { color: var(--danger); }
+
+/* Charts */
+.charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.chart-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm);
+}
+.chart-card h4 { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+.chart-wrap { position: relative; }
+canvas { max-height: 200px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid, .kpi-row { grid-template-columns: 1fr 1fr; }
+}

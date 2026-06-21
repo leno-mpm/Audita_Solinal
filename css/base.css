@@ -1,0 +1,76 @@
+/* ============================================================
+   AUDITA AI · base.css — Variables, Reset, Utilidades, Scrollbar
+   ============================================================ */
+
+:root {
+  --navy:       #0f1629;
+  --navy-mid:   #1a2540;
+  --navy-light: #243152;
+  --teal:       #10d9a0;
+  --teal-dark:  #0bb88a;
+  --teal-glow:  rgba(16, 217, 160, .15);
+  --bg:         #f4f6fb;
+  --surface:    #ffffff;
+  --surface2:   #f0f2f8;
+  --surface3:   #e8eaf2;
+  --border:     #e2e6f0;
+  --border2:    #cdd2e8;
+  --text:       #1a2035;
+  --text-dim:   #5a6481;
+  --text-muted: #9aa0b8;
+  --success:    #10d9a0;
+  --danger:     #f87171;
+  --warn:       #fbbf24;
+  --info:       #60a5fa;
+  --purple:     #a78bfa;
+  --grad-1: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #f97316 100%);
+  --grad-2: linear-gradient(90deg, #f97316 0%, #f43f5e 100%);
+  --grad-3: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+  --grad-4: linear-gradient(90deg, #fbbf24 0%, #f97316 100%);
+  --sidebar-w:         240px;
+  --sidebar-collapsed: 62px;
+  --topbar-h:          60px;
+  --radius:    12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 4px rgba(15,22,41,.06), 0 2px 12px rgba(15,22,41,.05);
+  --shadow:    0 4px 20px rgba(15,22,41,.10);
+  --shadow-lg: 0 8px 40px rgba(15,22,41,.15);
+  --transition: .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+input, select, textarea, button { font-family: inherit; font-size: inherit; }
+a { color: var(--teal); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Utilities */
+.text-xs    { font-size: 11px; }
+.text-sm    { font-size: 13px; }
+.text-dim   { color: var(--text-dim); }
+.text-muted { color: var(--text-muted); }
+.text-danger  { color: var(--danger); }
+.text-warn    { color: var(--warn); }
+.text-success { color: var(--teal-dark); }
+.text-info    { color: var(--info); }
+.text-center  { text-align: center; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.ml-1 { margin-left: 6px; }  .ml-4 { margin-left: 16px; }
+.mt-1 { margin-top: 4px; }   .mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }  .mt-4 { margin-top: 16px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; }
+
+/* Scrollbar global */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

@@ -1,0 +1,58 @@
+/* ============================================================
+   AUDITA AI · login.css — Pantalla de acceso
+   ============================================================ */
+
+#loginScreen {
+  display: flex; min-height: 100vh; background: var(--navy);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 80% 50%, rgba(16,217,160,.08), transparent),
+    radial-gradient(ellipse 50% 80% at 20% 100%, rgba(99,102,241,.12), transparent);
+}
+.login-card {
+  width: 100%; max-width: 440px; margin: auto;
+  background: var(--surface); border-radius: 20px; padding: 44px 40px;
+  box-shadow: var(--shadow-lg);
+}
+.login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+.login-logo-mark {
+  width: 44px; height: 44px; border-radius: 10px; background: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--navy);
+}
+.login-logo-text { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 800; color: var(--text); }
+.login-logo-text span { color: var(--teal); }
+.login-title { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+.login-sub { color: var(--text-dim); font-size: 13.5px; line-height: 1.6; margin-bottom: 28px; }
+
+.role-grid { display: flex; gap: 8px; margin-bottom: 28px; }
+.role-chip {
+  flex: 1; padding: 10px 8px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--surface2);
+  color: var(--text-dim); cursor: pointer; text-align: center; transition: var(--transition);
+}
+.role-chip:hover { border-color: var(--teal); color: var(--teal); }
+.role-chip.active { border-color: var(--teal); background: var(--teal-glow); color: var(--teal-dark); }
+
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.field label { font-size: 11.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; }
+
+input, select, textarea {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 14px; color: var(--text); width: 100%;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(16,217,160,.12);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+textarea { resize: vertical; min-height: 80px; }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%235a6481' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px;
+}
+.login-demo-hint {
+  margin-top: 18px; font-size: 11px; color: var(--text-muted);
+  text-align: center; line-height: 1.7;
+  background: var(--surface2); border-radius: 8px; padding: 10px;
+}
