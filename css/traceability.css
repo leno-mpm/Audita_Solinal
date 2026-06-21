@@ -1,3 +1,23 @@
 /* ============================================================
    AUDITA AI · traceability.css — Timeline de trazabilidad
    ============================================================ */
+
+.trace-day { margin-bottom: 22px; }
+.trace-day-header { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1.5px solid var(--border); margin-bottom: 12px; }
+.trace-day-label { font-weight: 700; font-size: 13px; color: var(--text); text-transform: capitalize; }
+.timeline { display: flex; flex-direction: column; gap: 8px; }
+.tl-item { display: flex; align-items: flex-start; gap: 14px; }
+.tl-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  margin-top: 4px; background: var(--text-muted);
+}
+.tl-dot-primary  { background: #6366f1; }
+.tl-dot-danger   { background: var(--danger); }
+.tl-dot-warn     { background: var(--warn); }
+.tl-dot-success  { background: var(--teal); }
+.tl-dot-info     { background: var(--info); }
+.tl-dot-muted    { background: var(--text-muted); }
+.tl-content { flex: 1; }
+.tl-time { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; font-weight: 600; }
+.tl-text { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.tl-meta { display: flex; align-items: center; gap: 6px; }
