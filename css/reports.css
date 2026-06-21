@@ -1,3 +1,46 @@
 /* ============================================================
    AUDITA AI · reports.css — Plantillas y preview de reportes
    ============================================================ */
+
+.report-templates { display: flex; flex-direction: column; gap: 10px; }
+.report-template-card {
+  display: flex; align-items: center; gap: 16px; padding: 16px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition);
+}
+.report-template-card:hover { border-color: var(--teal); background: rgba(16,217,160,.03); }
+.report-template-icon { font-size: 26px; flex-shrink: 0; }
+.report-template-info { flex: 1; }
+.report-template-name { font-weight: 700; font-size: 14px; color: var(--text); }
+.report-template-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* Preview */
+.report-preview { font-size: 13px; }
+.report-section { margin-bottom: 26px; }
+.report-section-title {
+  font-family: 'Fraunces', serif; font-size: 16px; font-weight: 800;
+  margin-bottom: 14px; color: var(--navy);
+  border-bottom: 2px solid var(--teal); padding-bottom: 6px;
+}
+.report-cover {
+  text-align: center; padding: 28px; background: var(--navy);
+  border-radius: var(--radius); margin-bottom: 26px;
+}
+.report-logo {
+  width: 60px; height: 60px; background: var(--teal); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 30px; font-weight: 800; color: var(--navy);
+  margin: 0 auto 14px;
+}
+.report-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.report-subtitle { font-size: 15px; color: rgba(255,255,255,.6); margin-bottom: 18px; }
+.report-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; text-align: left; font-size: 12px; color: rgba(255,255,255,.6); }
+
+/* KPI inline en reporte */
+.report-kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.report-kpi { text-align: center; flex: 1; min-width: 80px; background: var(--surface2); border-radius: var(--radius-sm); padding: 14px; border: 1.5px solid var(--border); }
+.report-kpi-val { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 800; color: var(--text); }
+.report-kpi-label { font-size: 10.5px; color: var(--text-dim); margin-top: 4px; font-weight: 600; }
+
+.report-finding { padding: 14px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 8px; border: 1.5px solid var(--border); }
+.report-finding-head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; flex-wrap: wrap; }
