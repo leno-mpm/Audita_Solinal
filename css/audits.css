@@ -1,3 +1,11 @@
 /* ============================================================
    AUDITA AI · audits.css — Acciones de fila en auditorías
    ============================================================ */
+
+.audit-row-actions {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .audit-row-actions { flex-direction: column; align-items: flex-start; }
+}
