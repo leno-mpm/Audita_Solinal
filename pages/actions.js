@@ -11,9 +11,11 @@ function autoCloseActionsByFinding(){
   const today = new Date().toISOString().slice(0,10);
   getVisibleActions().forEach(p => {
     if (p.estado === 'cerrado') return;
-    const f = State.findings.find(x => x.id === p.hallazgo_id);
-    if (f && f.fecha_limite && f.fecha_limite < today){
-      p.estado      = 'cerrado';
+    /* Usar la fecha límite propia del plan; si no tiene, la del hallazgo */
+    const f         = State.findings.find(x => x.id === p.hallazgo_id);
+    const fechaRef  = p.fecha_limite || f?.fecha_limite || '';
+    if (fechaRef && fechaRef < today){
+      p.estado       = 'cerrado';
       p.fecha_cierre = p.fecha_cierre || today;
     }
   });
@@ -118,21 +120,24 @@ function renderActionsTable(){
     <div class="table-wrap">
       <table class="t">
         <thead><tr>
-          <th>Código</th><th>Título</th><th>Hallazgo</th><th>Auditoría</th><th>Responsable</th><th>Evidencia</th><th>Estado</th><th></th>
+          <th>Código</th><th>Empresa</th><th>Auditoría</th><th>Hallazgo</th><th>Responsable</th><th>Fecha límite</th><th>Evidencia</th><th>Estado</th><th></th>
         </tr></thead>
         <tbody>
           ${list.length ? list.map(p => {
-            const finding = State.findings.find(f => f.id === p.hallazgo_id);
-            const audit   = finding ? State.audits.find(a => a.id === finding.auditoria_id) : null;
-            const resp    = getUserById(p.responsable_id);
+            const finding  = State.findings.find(f => f.id === p.hallazgo_id);
+            const audit    = finding ? State.audits.find(a => a.id === finding.auditoria_id) : null;
+            const empresa  = finding ? State.companies.find(c => c.id === finding.empresa_id) : null;
+            const resp     = getUserById(p.responsable_id);
+            const vencido  = p.fecha_limite && new Date().toISOString().slice(0,10) > p.fecha_limite && p.estado !== 'cerrado';
             const tieneEvidencia = !!(p.evidencia_auditado);
             return `<tr>
               <td class="cell-mono">${p.codigo}</td>
-              <td class="cell-strong">${esc(p.titulo)}</td>
-              <td class="text-sm text-dim">${finding?.codigo||'—'}</td>
+              <td class="text-sm cell-strong">${esc(empresa?.razon_social||'—')}</td>
               <td class="text-xs text-dim">${audit?.codigo||'—'}</td>
+              <td class="text-sm text-dim">${finding?.codigo||'—'}</td>
               <td class="text-sm">${esc(resp?.name||'—')}</td>
-              <td class="text-sm">${tieneEvidencia
+              <td class="text-xs ${vencido ? 'text-danger' : 'text-dim'}">${p.fecha_limite||'—'}</td>
+              <td>${tieneEvidencia
                 ? '<span class="badge badge-success">✓ Subida</span>'
                 : '<span class="badge badge-muted">Sin evidencia</span>'}</td>
               <td>${estadoAccionBadge(p.estado)}</td>
@@ -144,7 +149,7 @@ function renderActionsTable(){
                   ? `<button onclick="closeActionConfirm('${p.id}')" title="Cerrar plan">🔒</button>` : ''}
               </td>
             </tr>`;
-          }).join('') : '<tr><td colspan="8"><div class="empty"><div class="empty-icon">🎯</div>Sin planes con los filtros aplicados</div></td></tr>'}
+          }).join('') : '<tr><td colspan="9"><div class="empty"><div class="empty-icon">🎯</div>Sin planes con los filtros aplicados</div></td></tr>'}
         </tbody>
       </table>
     </div>`;
@@ -156,11 +161,18 @@ function openActionForm(hallazgoId = null){
 
   const findings = getVisibleFindings().filter(f => f.estado === 'abierto');
   const fndOpts  = findings.map(f =>
-    `<option value="${f.id}"${f.id===hallazgoId?' selected':''}>${f.codigo} — ${esc(f.descripcion.slice(0,60))}</option>`
+    `<option value="${f.id}"${f.id===hallazgoId?' selected':''}
+      data-limite="${f.fecha_limite||''}">${f.codigo} — ${esc(f.descripcion.slice(0,60))}</option>`
   ).join('');
   const respOpts = USERS_DB.filter(u => u.role === 'auditado').map(u =>
     `<option value="${u.id}">${esc(u.name)}</option>`
   ).join('');
+
+  /* Fecha límite inicial: tomada del hallazgo preseleccionado o vacía */
+  const today      = new Date().toISOString().slice(0,10);
+  const initFnd    = findings.find(f => f.id === hallazgoId) || findings[0];
+  const initMax    = initFnd?.fecha_limite || '';
+  const initLimite = initMax || today;
 
   openModal(`
     <div class="modal-head">
@@ -171,7 +183,7 @@ function openActionForm(hallazgoId = null){
       <div class="form-grid-2">
         <div class="field" style="grid-column:1/-1">
           <label>Hallazgo relacionado *</label>
-          <select id="nAct_fnd">${fndOpts||'<option value="">Sin hallazgos abiertos</option>'}</select>
+          <select id="nAct_fnd" onchange="onActionFndChange()">${fndOpts||'<option value="">Sin hallazgos abiertos</option>'}</select>
         </div>
         <div class="field" style="grid-column:1/-1">
           <label>Título del plan *</label>
@@ -194,6 +206,15 @@ function openActionForm(hallazgoId = null){
             <option value="baja">Baja</option>
           </select>
         </div>
+        <div class="field">
+          <label>Fecha de inicio *</label>
+          <input type="date" id="nAct_inicio" value="${today}" max="${initMax}">
+        </div>
+        <div class="field">
+          <label>Fecha límite *</label>
+          <input type="date" id="nAct_limite" value="${initLimite}" max="${initMax}">
+          ${initMax ? `<div class="text-xs text-dim mt-1">Máx. permitido por el hallazgo: <strong>${initMax}</strong></div>` : ''}
+        </div>
       </div>
       <div class="field"><label>Descripción detallada * <span class="text-xs text-dim">(qué debe hacer el auditado)</span></label>
         <textarea id="nAct_desc" placeholder="Describe las acciones que debe tomar el representante de la empresa..."></textarea>
@@ -205,6 +226,24 @@ function openActionForm(hallazgoId = null){
     </div>`, {size:'lg'});
 }
 
+function onActionFndChange(){
+  const sel     = document.getElementById('nAct_fnd');
+  const opt     = sel?.options[sel.selectedIndex];
+  const maxDate = opt?.dataset.limite || '';
+  const limField   = document.getElementById('nAct_limite');
+  const inicioField = document.getElementById('nAct_inicio');
+  if (limField){
+    limField.max = maxDate;
+    if (maxDate && limField.value > maxDate) limField.value = maxDate;
+    /* Actualizar hint */
+    const hint = limField.nextElementSibling;
+    if (hint && hint.classList.contains('text-xs')){
+      hint.innerHTML = maxDate ? `Máx. permitido por el hallazgo: <strong>${maxDate}</strong>` : '';
+    }
+  }
+  if (inicioField && maxDate) inicioField.max = maxDate;
+}
+
 function saveNewAction(){
   const hallazgo_id    = document.getElementById('nAct_fnd').value;
   const titulo         = document.getElementById('nAct_titulo').value.trim();
@@ -212,12 +251,23 @@ function saveNewAction(){
   const responsable_id = document.getElementById('nAct_resp').value;
   const prioridad      = document.getElementById('nAct_prio').value;
   const descripcion    = document.getElementById('nAct_desc').value.trim();
+  const fecha_inicio   = document.getElementById('nAct_inicio').value;
+  const fecha_limite   = document.getElementById('nAct_limite').value;
 
-  if (!hallazgo_id || !titulo || !responsable_id || !descripcion){
-    toast('Completa los campos obligatorios (*)','error'); return;
+  if (!hallazgo_id || !titulo || !responsable_id || !descripcion || !fecha_inicio || !fecha_limite){
+    toast('Completa todos los campos obligatorios (*)','error'); return;
   }
 
   const finding = State.findings.find(x => x.id === hallazgo_id);
+
+  /* Validar fechas */
+  if (fecha_inicio > fecha_limite){
+    toast('La fecha de inicio no puede ser posterior a la fecha límite','error'); return;
+  }
+  if (finding?.fecha_limite && fecha_limite > finding.fecha_limite){
+    toast(`La fecha límite no puede superar la del hallazgo (${finding.fecha_limite})`, 'error'); return;
+  }
+
   const codigo  = `PA-${new Date().getFullYear()}-${String(State.actions.length+1).padStart(3,'0')}`;
 
   State.actions.unshift({
@@ -227,6 +277,8 @@ function saveNewAction(){
     estado:'abierto',
     evidencia_auditado: '',
     fecha_creacion: new Date().toISOString().slice(0,10),
+    fecha_inicio,
+    fecha_limite,
     fecha_evidencia: '',
     comentarios:[]
   });
@@ -265,6 +317,11 @@ function openActionDetail(id){
         <div><strong class="text-xs text-dim">Auditoría</strong><div>${audit?.codigo||'—'}</div></div>
         <div><strong class="text-xs text-dim">Responsable</strong><div>${esc(resp?.name||'—')}</div></div>
         <div><strong class="text-xs text-dim">Creado</strong><div>${p.fecha_creacion||'—'}</div></div>
+        <div><strong class="text-xs text-dim">Fecha de inicio</strong><div>${p.fecha_inicio||'—'}</div></div>
+        <div>
+          <strong class="text-xs text-dim">Fecha límite</strong>
+          <div class="${p.fecha_limite && new Date().toISOString().slice(0,10) > p.fecha_limite && p.estado !== 'cerrado' ? 'text-danger' : ''}">${p.fecha_limite||'—'}</div>
+        </div>
       </div>
       <div class="mb-4">
         <strong class="text-xs text-dim">Descripción del plan (qué debe hacer el auditado)</strong>

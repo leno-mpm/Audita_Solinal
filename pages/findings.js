@@ -14,9 +14,14 @@ function renderFindings(){
   const total = list.length;
   const open  = list.filter(f => f.estado !== 'cerrado').length;
 
-  /* Opciones de auditoría para el filtro */
-  const audOpts = getVisibleAudits()
+  /* Opciones para filtros — admin/auditor ven todo */
+  const auditsForFilter = (role === 'auditado') ? getVisibleAudits() : State.audits;
+  const audOpts = auditsForFilter
     .map(a => `<option value="${a.id}">${a.codigo} — ${getCompany(a.empresa_id)?.razon_social||''}</option>`)
+    .join('');
+  const empOpts = State.companies
+    .sort((a,b) => a.razon_social.localeCompare(b.razon_social, 'es', {sensitivity:'base'}))
+    .map(c => `<option value="${c.id}">${esc(c.razon_social)}</option>`)
     .join('');
 
   const html = `
@@ -24,10 +29,11 @@ function renderFindings(){
       <div class="page-header">
         <div>
           <h1 class="page-title">Hallazgos</h1>
-          <div class="page-subtitle">${role==='admin'?'Todos los hallazgos del sistema':role==='auditor'?'Hallazgos de mis auditorías':'Hallazgos de mi empresa'}</div>
+          <div class="page-subtitle">${role==='auditado'?'Hallazgos de mi empresa':'Todos los hallazgos del sistema'}</div>
         </div>
         <div class="page-actions">
           <button class="btn btn-secondary" onclick="exportFindingsCSV()">↓ CSV</button>
+          ${hasRole('auditor') ? '<button class="btn btn-primary" onclick="openFindingForm()">+ Nuevo hallazgo</button>' : ''}
         </div>
       </div>
 
@@ -74,6 +80,13 @@ function renderFindings(){
               <option value="baja">Baja</option>
             </select>
           </div>
+          ${(role === 'admin' || role === 'auditor') ? `
+          <div class="field"><label>Empresa</label>
+            <select id="f_fnd_emp" onchange="renderFindingsTable()">
+              <option value="">Todas</option>
+              ${empOpts}
+            </select>
+          </div>` : ''}
           <div class="field"><label>Buscar</label>
             <input id="f_fnd_q" placeholder="Código, descripción, requisito..." oninput="renderFindingsTable()">
           </div>
@@ -110,8 +123,10 @@ function renderFindingsTable(){
   const crit   = document.getElementById('f_fnd_crit')?.value   || '';
   const q      = (document.getElementById('f_fnd_q')?.value     || '').toLowerCase();
 
+  const empId  = document.getElementById('f_fnd_emp')?.value     || '';
   let list = getVisibleFindings();
   if (audId)  list = list.filter(f => f.auditoria_id === audId);
+  if (empId)  list = list.filter(f => f.empresa_id   === empId);
   if (tipo)   list = list.filter(f => f.tipo         === tipo);
   if (estado) list = list.filter(f => f.estado       === estado);
   if (crit)   list = list.filter(f => f.criticidad   === crit);
@@ -127,16 +142,18 @@ function renderFindingsTable(){
     <div class="table-wrap">
       <table class="t">
         <thead><tr>
-          <th>Código</th><th>Tipo</th><th>Descripción</th><th>Auditoría</th><th>Requisito</th><th>Criticidad</th><th>Estado</th><th>Responsable</th><th></th>
+          <th>Código</th><th>Tipo</th><th>Descripción</th><th>Empresa</th><th>Auditoría</th><th>Requisito</th><th>Criticidad</th><th>Estado</th><th>Responsable</th><th></th>
         </tr></thead>
         <tbody>
           ${list.length ? list.map(f => {
-            const audit = State.audits.find(a => a.id === f.auditoria_id);
-            const resp  = getUserById(f.responsable_id || f.auditor_id);
+            const audit   = State.audits.find(a => a.id === f.auditoria_id);
+            const empresa = State.companies.find(c => c.id === f.empresa_id);
+            const resp    = getUserById(f.responsable_id || f.auditor_id);
             return `<tr>
               <td class="cell-mono">${f.codigo}</td>
               <td><span class="badge ${badgeForFinding(f.tipo)}">${tipoHallazgoLabel(f.tipo)}</span></td>
               <td class="cell-wrap">${esc(f.descripcion.slice(0,100))}${f.descripcion.length>100?'...':''}</td>
+              <td class="text-sm">${esc(empresa?.razon_social||'—')}</td>
               <td class="text-sm text-dim">${audit?.codigo||'—'}</td>
               <td class="text-xs">${esc(f.requisito||'—')}</td>
               <td>${criticidadBadge(f.criticidad)}</td>
@@ -146,10 +163,13 @@ function renderFindingsTable(){
                 <button onclick="openFindingDetail('${f.id}')" title="Ver detalle">👁</button>
                 ${canEdit && f.estado === 'abierto' ? `<button onclick="editFindingModal('${f.id}')" title="Editar">✏️</button>` : ''}
                 ${hasRole('auditor') && f.estado === 'abierto' ? `<button onclick="closeFinding('${f.id}')" title="Cerrar hallazgo">🔒</button>` : ''}
-                ${hasRole('auditado') && f.estado === 'abierto' ? `<button onclick="respondFinding('${f.id}')" title="Responder">💬</button>` : ''}
+                ${hasRole('auditado') && f.estado === 'abierto' ? `
+                  <button onclick="respondFinding('${f.id}')" title="Responder">💬</button>
+                  <button onclick="adjuntarDescargo('${f.id}')" title="Adjuntar descargo">📎</button>
+                ` : ''}
               </td>
             </tr>`;
-          }).join('') : '<tr><td colspan="9"><div class="empty"><div class="empty-icon">🚩</div>Sin hallazgos con los filtros aplicados</div></td></tr>'}
+          }).join('') : '<tr><td colspan="10"><div class="empty"><div class="empty-icon">🚩</div>Sin hallazgos con los filtros aplicados</div></td></tr>'}
         </tbody>
       </table>
     </div>`;
@@ -298,6 +318,15 @@ function openFindingDetail(id){
           <strong class="text-xs text-dim">💬 Respuesta del auditado</strong>
           <div class="text-sm mt-1">${esc(f.respuesta_auditado)}</div>
         </div>` : ''}
+      ${f.descargo_nombre ? `
+        <div class="mb-3" style="background:rgba(96,165,250,.07);border-left:3px solid var(--info);padding:12px 14px;border-radius:0 8px 8px 0">
+          <strong class="text-xs text-dim">📎 Documento de descargo</strong>
+          <div class="text-sm mt-1" style="display:flex;align-items:center;gap:8px">
+            <span>📄</span>
+            <span>${'${esc(f.descargo_nombre)}'}</span>
+            <span class="text-xs text-dim">· Subido el ${'${f.descargo_fecha||"—"}'}</span>
+          </div>
+        </div>` : ''}
 
       <strong class="text-xs text-dim">Planes de acción (${actions.length})</strong>
       <div class="mt-2">
@@ -311,9 +340,10 @@ function openFindingDetail(id){
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
 
-      ${/* Auditado: solo responde, NO propone plan */
+      ${/* Auditado: responde y adjunta descargo */
         hasRole('auditado') && f.estado === 'abierto'
-        ? `<button class="btn btn-secondary" onclick="closeModal();setTimeout(()=>respondFinding('${id}'),100)">💬 Responder</button>` : ''}
+        ? `<button class="btn btn-secondary" onclick="closeModal();setTimeout(()=>respondFinding('${id}'),100)">💬 Responder</button>
+           <button class="btn btn-ghost" onclick="closeModal();setTimeout(()=>adjuntarDescargo('${id}'),100)">📎 Adjuntar descargo</button>` : ''}
 
       ${/* Auditor: puede proponer plan de acción */
         hasRole('auditor') && f.estado !== 'cerrado'
@@ -398,6 +428,13 @@ function respondFinding(id){
         <label>Tu respuesta</label>
         <textarea id="resp_text" placeholder="Explica qué acciones tomará o ha tomado tu equipo ante este hallazgo...">${esc(f.respuesta_auditado||'')}</textarea>
       </div>
+      <div class="field">
+        <label>Documento de descargo <span class="text-xs text-dim">(opcional)</span></label>
+        <input type="file" id="resp_file" accept=".pdf,.docx,.xlsx,.jpg,.png,.zip"
+          style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">
+        <div class="text-xs text-muted mt-1">PDF, Word, Excel, imágenes — solo se guarda el nombre del archivo</div>
+        ${f.descargo_nombre ? `<div class="text-xs text-dim mt-1">📎 Archivo actual: ${esc(f.descargo_nombre)}</div>` : ''}
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
@@ -410,6 +447,13 @@ function submitFindingResponse(id){
   if (!text){ toast('Escribe una respuesta antes de enviar','error'); return; }
   const f = State.findings.find(x => x.id === id);
   f.respuesta_auditado = text;
+  /* Guardar documento de descargo si se adjuntó */
+  const fileInput = document.getElementById('resp_file');
+  const file = fileInput?.files?.[0];
+  if (file) {
+    f.descargo_nombre = file.name;
+    f.descargo_fecha  = new Date().toISOString().slice(0,10);
+  }
   /* Estado se mantiene 'abierto' — solo el auditor lo cierra */
   logAction(`Respondió hallazgo ${f.codigo}`, 'Hallazgos');
   closeModal();
@@ -441,11 +485,61 @@ function closeFinding(id){
 
 /* -------- Export CSV -------- */
 function exportFindingsCSV(){
-  const rows = [['Código','Tipo','Estado','Criticidad','Auditoría','Requisito','Descripción','Responsable','Fecha límite']];
+  const rows = [['Código','Tipo','Estado','Criticidad','Empresa','Auditoría','Requisito','Descripción','Responsable','Fecha límite']];
   getVisibleFindings().forEach(f => {
-    const audit = State.audits.find(a => a.id === f.auditoria_id);
-    const resp  = getUserById(f.responsable_id);
-    rows.push([f.codigo, tipoHallazgoLabel(f.tipo), f.estado, f.criticidad||'', audit?.codigo||'', f.requisito||'', f.descripcion, resp?.name||'', f.fecha_limite||'']);
+    const audit   = State.audits.find(a => a.id === f.auditoria_id);
+    const empresa = State.companies.find(c => c.id === f.empresa_id);
+    const resp    = getUserById(f.responsable_id);
+    rows.push([f.codigo, tipoHallazgoLabel(f.tipo), f.estado, f.criticidad||'', empresa?.razon_social||'', audit?.codigo||'', f.requisito||'', f.descripcion, resp?.name||'', f.fecha_limite||'']);
   });
   downloadCSV(rows, 'hallazgos.csv');
 }
+
+/* -------- Auditado: adjuntar documento de descargo -------- */
+function adjuntarDescargo(id){
+  const f = State.findings.find(x => x.id === id);
+  if (!f) return;
+  openModal(`
+    <div class="modal-head">
+      <div class="modal-title">📎 Documento de descargo · ${f.codigo}</div>
+      <div class="close-x" onclick="closeModal()">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="mb-3" style="background:rgba(96,165,250,.07);border:1.5px solid rgba(96,165,250,.2);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:#1d4ed8">
+        ℹ Adjunta el documento oficial de respuesta o descargo de tu empresa ante este hallazgo.
+      </div>
+      <div class="text-sm mb-3">
+        <strong class="text-xs text-dim">Hallazgo</strong>
+        <div class="mt-1">${esc(f.descripcion)}</div>
+      </div>
+      ${f.descargo_nombre ? `
+        <div class="mb-3" style="background:var(--surface2);border-radius:8px;padding:10px 14px">
+          <div class="text-xs text-dim">Documento actual</div>
+          <div class="text-sm mt-1">📄 ${esc(f.descargo_nombre)} <span class="text-xs text-dim">· ${f.descargo_fecha||'—'}</span></div>
+        </div>` : ''}
+      <div class="field">
+        <label>${f.descargo_nombre ? 'Reemplazar documento' : 'Seleccionar documento *'}</label>
+        <input type="file" id="desc_file" accept=".pdf,.docx,.xlsx,.jpg,.png,.zip"
+          style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;width:100%">
+        <div class="text-xs text-muted mt-1">Formatos aceptados: PDF, Word, Excel, imágenes, ZIP</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDescargo('${id}')">Adjuntar documento</button>
+    </div>`);
+}
+
+function saveDescargo(id){
+  const fileInput = document.getElementById('desc_file');
+  const file = fileInput?.files?.[0];
+  if (!file){ toast('Selecciona un archivo antes de continuar','error'); return; }
+  const f = State.findings.find(x => x.id === id);
+  f.descargo_nombre = file.name;
+  f.descargo_fecha  = new Date().toISOString().slice(0,10);
+  logAction(`Adjuntó documento de descargo a hallazgo ${f.codigo} (${file.name})`, 'Hallazgos');
+  closeModal();
+  toast(`Documento "${file.name}" adjuntado correctamente`, 'success');
+  navigate('findings');
+}
+

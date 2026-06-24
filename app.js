@@ -188,12 +188,9 @@ function getAuditadoCompany(){
 
 function getVisibleFindings(){
   const role = State.user?.role;
-  if (role === 'admin') return State.findings;
-  if (role === 'auditor'){
-    const myAudits = State.audits.filter(a => a.auditor_id === State.user.id || (a.equipo||[]).includes(State.user.id)).map(a => a.id);
-    return State.findings.filter(f => myAudits.includes(f.auditoria_id));
-  }
-  // auditado
+  // Admin y auditor ven TODOS los hallazgos del sistema
+  if (role === 'admin' || role === 'auditor') return State.findings;
+  // Auditado: solo los hallazgos de su empresa
   const myCompany = getAuditadoCompany();
   return State.findings.filter(f => f.empresa_id === myCompany);
 }

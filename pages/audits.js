@@ -575,6 +575,7 @@ function renderChecklistPage(){
         </div>
         <span class="badge badge-success">✓ Conforme ${stats.conforme}</span>
         <span class="badge badge-danger">✗ NC ${stats.nc}</span>
+        <span class="badge badge-warn">~ Parcial ${stats.parcial}</span>
         <span class="badge badge-muted">N/A ${stats.na}</span>
         ${readOnly ? `<span class="text-xs text-dim" style="margin-left:auto">Resultado de la evaluación del auditor</span>` : ''}
       </div>
@@ -605,11 +606,11 @@ function renderChapter(ch, responses, idx, auditId, readOnly){
     </div>`;
 }
 
-/* Etiqueta con color para cada resultado (sin "Parcial") */
 function resultLabel(result){
   const map = {
     'C':  `<span class="badge badge-success" style="font-size:12px;padding:4px 10px">✓ Conforme</span>`,
     'NC': `<span class="badge badge-danger"  style="font-size:12px;padding:4px 10px">✗ No conforme</span>`,
+    'PC': `<span class="badge badge-warn"    style="font-size:12px;padding:4px 10px">~ Parcial</span>`,
     'NA': `<span class="badge badge-muted"   style="font-size:12px;padding:4px 10px">— N/A</span>`,
   };
   return map[result] || `<span class="badge badge-muted" style="font-size:12px;padding:4px 10px">Sin evaluar</span>`;
@@ -639,12 +640,13 @@ function renderRequisite(it, responses, auditId, readOnly){
         <div class="result-buttons">
           <button class="result-btn ${result==='C'?'active-c':''}" onclick="setChecklistResult('${auditId}','${esc(it.codigo)}','C')">✓ Conforme</button>
           <button class="result-btn ${result==='NC'?'active-nc':''}" onclick="setChecklistResult('${auditId}','${esc(it.codigo)}','NC')">✗ No conforme</button>
+          <button class="result-btn ${result==='PC'?'active-pc':''}" onclick="setChecklistResult('${auditId}','${esc(it.codigo)}','PC')">~ Parcial</button>
           <button class="result-btn ${result==='NA'?'active-na':''}" onclick="setChecklistResult('${auditId}','${esc(it.codigo)}','NA')">— N/A</button>
         </div>
         <textarea class="req-obs" placeholder="Observación, evidencia revisada..." oninput="setChecklistObs('${auditId}','${esc(it.codigo)}',this.value)">${esc(r.obs||'')}</textarea>
         <div class="req-attach">
           <button class="attach-btn" onclick="attachChecklistEvidence('${auditId}','${esc(it.codigo)}')">📎 Adjuntar evidencia</button>
-          ${result==='NC'?`<button class="attach-btn" style="border-color:var(--danger);color:var(--danger)" onclick="findingFromChecklist('${auditId}','${esc(it.codigo)}')">🚩 Crear hallazgo</button>`:''}
+          ${(result==='NC'||result==='PC')?`<button class="attach-btn" style="border-color:var(--danger);color:var(--danger)" onclick="findingFromChecklist('${auditId}','${esc(it.codigo)}')">🚩 Crear hallazgo</button>`:''}
           ${(r.evidencias?.length||0)>0?`<span class="text-xs text-dim">${r.evidencias.length} evidencia(s)</span>`:''}
         </div>`}
       </div>
@@ -787,15 +789,20 @@ function saveChecklistProgress(){
   toast('Avance guardado', 'success');
 }
 function computeChecklistStats(checklist, responses){
-  let total=0, evaluated=0, conforme=0, nc=0, na=0;
+  let total=0, evaluated=0, conforme=0, nc=0, parcial=0, na=0;
   checklist.forEach(ch => ch.items.forEach(it => {
     total++;
     const r = responses[it.codigo]?.result;
-    /* Solo C, NC y NA cuentan como evaluados (no existe Parcial) */
-    if(r==='C'||r==='NC'||r==='NA'){ evaluated++; if(r==='C')conforme++; else if(r==='NC')nc++; else na++; }
+    if(r==='C'||r==='NC'||r==='PC'||r==='NA'){
+      evaluated++;
+      if(r==='C') conforme++;
+      else if(r==='NC') nc++;
+      else if(r==='PC') parcial++;
+      else na++;
+    }
   }));
   const pct = total ? Math.round((evaluated/total)*100) : 0;
-  return {total, evaluated, conforme, nc, na, pct};
+  return {total, evaluated, conforme, nc, parcial, na, pct};
 }
 
 /* -------- Export -------- */

@@ -333,7 +333,7 @@ const AUDITS_SEED = [
 const FINDINGS_SEED = [
   {
     id:'f1', codigo:'HAL-2026-001', auditoria_id:'a1', tipo:'no_conformidad_mayor',
-    requisito:'9.1.2', proceso:'Cumplimiento legal',
+    requisito:'9.1.2', proceso:'Cumplimiento legal', fecha_limite:'2026-06-30',
     descripcion:'La sede no ha obtenido el permiso de uso de diesel para las instalaciones según Resolución 006-003 Directorio Extraordinario ARCH-2015.',
     evidencia:'Revisión documental: no se evidencia permiso. Compras de diésel facturadas a PETROGOSA (Factura 23716) sin respaldo regulatorio.',
     auditor_id:'u2', fecha:'2026-04-15', criticidad:'alta', estado:'abierto',
@@ -342,7 +342,7 @@ const FINDINGS_SEED = [
   },
   {
     id:'f2', codigo:'HAL-2026-002', auditoria_id:'a1', tipo:'no_conformidad_mayor',
-    requisito:'6.1.2', proceso:'Operaciones ASU',
+    requisito:'6.1.2', proceso:'Operaciones ASU', fecha_limite:'2026-06-30',
     descripcion:'No se han considerado todos los usos de energía eléctrica del sitio en el análisis de aspectos ambientales significativos.',
     evidencia:'Matriz de aspectos DA-EC-REVENERGET solo considera ASU Plant. No se evidencia evaluación de otras áreas.',
     auditor_id:'u2', fecha:'2026-04-16', criticidad:'alta', estado:'abierto',
@@ -351,7 +351,7 @@ const FINDINGS_SEED = [
   },
   {
     id:'f3', codigo:'HAL-2026-003', auditoria_id:'a1', tipo:'no_conformidad_menor',
-    requisito:'9.1.1', proceso:'Mantenimiento',
+    requisito:'9.1.1', proceso:'Mantenimiento', fecha_limite:'2026-07-15',
     descripcion:'Equipos de medición de variables clave (PowerLogic PM550, monitor de energía 1319101) no cuentan con verificación metrológica documentada.',
     evidencia:'Programa de calibración DA-EC-PROCALIGYE-09: equipos de energía y compresores marcados como "Not performed".',
     auditor_id:'u3', fecha:'2026-04-16', criticidad:'media', estado:'abierto',
@@ -360,7 +360,7 @@ const FINDINGS_SEED = [
   },
   {
     id:'f4', codigo:'HAL-2026-004', auditoria_id:'a1', tipo:'observacion',
-    requisito:'7.3', proceso:'RRHH',
+    requisito:'7.3', proceso:'RRHH', fecha_limite:'2026-08-31',
     descripcion:'Personal contratista (mantenimiento de transformadores BRITRANSFORMADORES) sin evidencia de inducción ambiental específica del sitio.',
     evidencia:'Registro de inducción del 21-02-2025 no incluye contenido ambiental.',
     auditor_id:'u3', fecha:'2026-04-16', criticidad:'baja', estado:'abierto',
@@ -369,7 +369,7 @@ const FINDINGS_SEED = [
   },
   {
     id:'f5', codigo:'HAL-2026-005', auditoria_id:'a1', tipo:'oportunidad_mejora',
-    requisito:'10.3', proceso:'Liderazgo',
+    requisito:'10.3', proceso:'Liderazgo', fecha_limite:'2026-09-30',
     descripcion:'Se identifica oportunidad de integrar el sistema de gestión ambiental con el sistema de gestión de energía (ISO 50001) ya implementado.',
     evidencia:'Existen dos comités separados; los temas ambientales y energéticos se gestionan por procesos paralelos.',
     auditor_id:'u2', fecha:'2026-04-17', criticidad:'baja', estado:'abierto',
@@ -378,7 +378,7 @@ const FINDINGS_SEED = [
   },
   {
     id:'f6', codigo:'HAL-2025-012', auditoria_id:'a3', tipo:'no_conformidad_menor',
-    requisito:'8.5.4', proceso:'Pasteurización',
+    requisito:'8.5.4', proceso:'Pasteurización', fecha_limite:'2025-12-31',
     descripcion:'Registros de monitoreo del PCC de pasteurización (T° y tiempo) presentan dos turnos sin firma de verificación del supervisor en noviembre 2025.',
     evidencia:'Registros R-PAS-001 días 03, 07 y 18 de noviembre 2025, turno B.',
     auditor_id:'u2', fecha:'2025-11-11', criticidad:'media', estado:'cerrado',
@@ -392,7 +392,7 @@ const ACTIONS_SEED = [
   {
     id:'p1', codigo:'PA-2026-001', hallazgo_id:'f1', tipo:'accion_correctiva',
     descripcion:'Iniciar trámite ante la ARCH para obtener el permiso de uso/almacenamiento de diésel.',
-    responsable_id:'u4', fecha_inicio:'2026-04-20',
+    responsable_id:'u4', fecha_inicio:'2026-04-20', fecha_limite:'2026-06-20',
     prioridad:'alta', estado:'abierto',
     recursos:'Asesoría legal externa (Sambito), $1,500',
     evidencia_auditado:'Oficio enviado el 30-06-2026 a la ARCH solicitando inicio del proceso de registro.',
@@ -402,7 +402,7 @@ const ACTIONS_SEED = [
   {
     id:'p2', codigo:'PA-2026-002', hallazgo_id:'f2', tipo:'accion_correctiva',
     descripcion:'Actualizar matriz de aspectos e impactos ambientales incluyendo TODAS las áreas funcionales del sitio.',
-    responsable_id:'u4', fecha_inicio:'2026-04-22',
+    responsable_id:'u4', fecha_inicio:'2026-04-22', fecha_limite:'2026-06-25',
     prioridad:'alta', estado:'abierto',
     recursos:'Equipo SHEQ, Coordinador ambiental',
     evidencia_auditado:'', fecha_evidencia:'',
@@ -411,7 +411,7 @@ const ACTIONS_SEED = [
   {
     id:'p3', codigo:'PA-2026-003', hallazgo_id:'f3', tipo:'correccion',
     descripcion:'Verificación metrológica de medidores eléctricos clave y plan de calibración con frecuencia anual.',
-    responsable_id:'u5', fecha_inicio:'2026-04-25',
+    responsable_id:'u5', fecha_inicio:'2026-04-25', fecha_limite:'2026-07-10',
     prioridad:'media', estado:'abierto',
     recursos:'Laboratorio acreditado, $3,200',
     evidencia_auditado:'', fecha_evidencia:'',
@@ -420,7 +420,7 @@ const ACTIONS_SEED = [
   {
     id:'p4', codigo:'PA-2026-004', hallazgo_id:'f4', tipo:'mejora',
     descripcion:'Actualizar el procedimiento de inducción para contratistas incluyendo módulo ambiental específico del sitio.',
-    responsable_id:'u4', fecha_inicio:'2026-05-01',
+    responsable_id:'u4', fecha_inicio:'2026-05-01', fecha_limite:'2026-08-15',
     prioridad:'baja', estado:'abierto',
     recursos:'Equipo SHEQ',
     evidencia_auditado:'', fecha_evidencia:'',
@@ -429,7 +429,7 @@ const ACTIONS_SEED = [
   {
     id:'p5', codigo:'PA-2025-018', hallazgo_id:'f6', tipo:'accion_correctiva',
     descripcion:'Reforzar instrucción al personal supervisor sobre frecuencia y modo de firma de verificación de registros del PCC.',
-    responsable_id:'u5', fecha_inicio:'2025-11-15',
+    responsable_id:'u5', fecha_inicio:'2025-11-15', fecha_limite:'2025-12-15',
     prioridad:'media', estado:'cerrado', fecha_cierre:'2025-12-10',
     recursos:'Tiempo de capacitación interna',
     evidencia_auditado:'Registros de capacitación 25-11-2025. Verificación posterior: 100% de registros firmados en diciembre.',
